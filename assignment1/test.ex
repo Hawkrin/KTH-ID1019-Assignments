@@ -60,5 +60,82 @@ defmodule Test do
     product_clauses(m-1, n) + n
   end
 
+  # l = [1,2,3,4,5,6]
+
+  # return the n’th element of the list l
+  def nth(n, l) do
+    Enum.at(l, n)
+  end
+
+  # return the number of elements in the list l
+  def len(l) do
+    Enum.count(l)
+  end
+
+  # return the sum of all elements in the list l, assume that all elements are integers
+  def sum(l) do
+    Enum.sum(l)
+  end
+
+  # return a list where all elements are duplicated
+  def duplicate(l) do
+    List.duplicate(l, 2)
+  end
+
+  # add the element x to the list l if it is not in the list
+  def add(x, l) do
+    if(!Enum.member?(l, x)) do
+      List.insert_at(l, List.last(l), x)
+    end
+  end
+
+  # remove all occurrences of x in l
+  def remove(x, l) do
+    List.delete(l, x)
+  end
+
+  # return a list of unique elements in the list l, that is [:a, :b, :d] are the unique elements in the list [:a, :b, :a, :d, :a,:b, :b, :a]
+  def unique(l) do
+    Enum.uniq(l)
+  end
+
+  # return a list containing lists of equal elements, [:a, :a, :b, :c, :b, :a, :c] should return [[:a, :a, :a], [:b, :b], [:c, :c]]
+  def pack(l) do
+    Enum.chunk_by(l, &(rem(&1, 2) == 1))
+  end
+
+  # return a list where the order of elements is reversed
+  def reverse(l) do
+    Enum.reverse(l)
+  end
+
+
+
+
+  def isort(l) do
+      isort(l, ...)
+    end
+
+    def isort(l, sorted) do
+      case ... do
+        [] ->
+          ...
+        [h | t] ->
+          ...
+      end
+    end
+
+  def insert(element, list) do
+    if(Enum.empty?(list))
+      List.insert_at(list, 0, element)
+    else
+      Enum.each(list, &IO.inspect/1)
+        for element <- list do
+          if()
+        end
+  end
+
+
+
 
 end
