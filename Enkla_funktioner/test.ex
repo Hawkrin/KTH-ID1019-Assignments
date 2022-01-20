@@ -86,6 +86,17 @@ defmodule Test do
   def add(x, l) do
     if(!Enum.member?(l, x)) do
       List.insert_at(l, List.last(l), x)
+    else
+      IO.puts("The number is already in the list")
+    end
+  end
+
+  # add the element x to the list l if it is not in the list 2
+  def add2(x,l) do
+    if(!Enum.member?(l, x)) do
+        [x | l]
+    else
+        IO.puts("The number is already in the list")
     end
   end
 
@@ -109,30 +120,13 @@ defmodule Test do
     Enum.reverse(l)
   end
 
-
-
-
-  def isort(l) do
-      isort(l, ...)
+  # fibonnaci function written recursively
+  def fib(n) do
+    case n do
+      0 -> 0
+      1 -> 1
+      _ -> fib(n-1) + fib(n-2)
     end
-
-    def isort(l, sorted) do
-      case ... do
-        [] ->
-          ...
-        [h | t] ->
-          ...
-      end
-    end
-
-  def insert(element, list) do
-    if(Enum.empty?(list))
-      List.insert_at(list, 0, element)
-    else
-      Enum.each(list, &IO.inspect/1)
-        for element <- list do
-          if()
-        end
   end
 
 end
