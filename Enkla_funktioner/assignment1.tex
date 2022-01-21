@@ -1,6 +1,7 @@
 \documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{minted}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -16,7 +17,7 @@
 
 For this assignment two functions were created. The first one is the first elixir function I wrote without following any norms/standards hence the use of if/else statements. The second function is more elixir specific via the case block and the use of recursion.
 
-The first function called add2(x,l) takes in an element and a list as parameters and if the element is not currently in the list and it's added via pattern matching. But if the element is in the list then a statement is printed to the console instead.
+The first function called sum takes in an element and a list as parameters and if the element is not currently in the list and it's added via pattern matching. But if the element is in the list then a statement is printed to the console instead.
 
 The second function is a fibonnaci function. It takes in a number from the user user and outputs the fibonnaci summary to the console. Here the "case" is used instead of and if/else block. So if the number is 0 then then 0 is printed to the console, if the number is 1 then then 1 is printed to the console. But if it's a number which is not 0 nor 1 then the fibonnaci number is being calculated recursively via fib(n-1) + fib(n-2).
 
@@ -24,7 +25,8 @@ The second function is a fibonnaci function. It takes in a number from the user 
 
 The first function was pretty straightforward because I've used if/else blocks a lot in all the other courses. And we got a taste of pattern matching in both discrete math and in JavaScript course.
 
-The second function was a bit more tricky though, especially when it was supposed to be recursive. The case part wasn't to hard to understand but how to make it work properly as a recursive function was the problem. I managed to figure out how to do it recursively but it was via a lot of if/else blocks, until I saw the course video which show how to use a case block instead.
+The second function was a bit more tricky though, especially when it was supposed to be recursive. The case block wasn't to hard to understand but how to make it work properly as a recursive function was the problem. I managed to figure out how to do it recursively but it was via a lot of if/else blocks, until I saw the course video which show how to use a case block instead.
+
 
 \section*{Inserting code}
 
@@ -32,27 +34,41 @@ The second function was a bit more tricky though, especially when it was suppose
 
 #First function:
 
-    # add the element x to the list l if it is not in the list 
-    def add2(x,l) do
-        if(!Enum.member?(l, x)) do
-            [x | l]
-        else
-            IO.puts("The number is already in the list")
-        end
-    end
-  
 
-#Second function:
+  # return the sum of all elements in the list l, assume that all elements are integers
+  def sum2([]) do
+    0
+  end
 
- # fibonnaci function written recursively
-  def fib(n) do
-    case n do
-      0 -> 0
-      1 -> 1
-      _ -> fib(n-1) + fib(n-2)
-    end
+  def sum2([head|tails]) do
+    head + sum2(tails)
   end
   
+ 
+
+#Second function:
+    
+    # fibonnaci function written recursively
+    def fib(n) do
+        case n do
+            0 -> 0
+            1 -> 1
+            _ -> fib(n-1) + fib(n-2)
+        end
+      end
+  
  \end{minted}
+ 
+ This is the list used for the first function:
+
+\includegraphics[scale=0.5]{images/enkla_funktioner_1.jpg}
+
+And the output was:
+
+\includegraphics[scale=0.5]{images/enkla_funktioner_2.png}
+
+And after running the fibonnaci function the console looked like this:
+
+\includegraphics[scale=0.5]{images/enkla_funktioner_3.png}
 
 \end{document}

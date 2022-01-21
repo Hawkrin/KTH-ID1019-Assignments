@@ -77,6 +77,16 @@ defmodule Test do
     Enum.sum(l)
   end
 
+  # return the sum of all elements in the list l, assume that all elements are integers
+  def sum2([]) do
+    0
+  end
+
+  def sum2([head|tails]) do
+    head + sum2(tails)
+  end
+
+
   # return a list where all elements are duplicated
   def duplicate(l) do
     List.duplicate(l, 2)
