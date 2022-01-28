@@ -22,14 +22,14 @@ defmodule Derivate do
   def deriv({:mul, e1, e2}, v) do {:add, {:mul, deriv(e1, v), e2}, {:mul, e1, deriv(e2, v)}} end
 
   def deriv({:exp, e, {:num, n}}, v) do {:mul, {:mul, {:num, n}, {:exp, e, {:num, n-1}}}, deriv(e, v)} end
+
   def deriv({:exp, {:var, x}, {:var, n}}, v) do {:mul, {:var, n}, {:exp, {:var, x}, {:add, {:var, n}, {:num, -1}}}} end #x^n
 
   def deriv({:sin, e}, v) do {:mul, deriv(e, v), {:cos, e}} end #sin(x)
 
   def deriv({:cos, e}, v) do {:mul, {:num, -1}, {:mul, deriv(e, v), {:sin, e}}} end #cos(x)
 
-  def deriv({:ln, x}, x) do {:mul} end #ln(x)
-  def deriv({:ln, x}, x) do {{{:var, x}, {:exp, e, {:num, -1}}}, deriv(e, v)} end
+  def deriv({:ln,{:var, x}}, _v) do {:exp, {:var,x}, {:num, -1}} end #ln(x)
 
   def deriv({:sqrt, e1}, x) do {:frac, deriv(e1,x), {:mul, {:const, 2}, {:sqrt, e1}}} end #sqr(x)
 
@@ -98,8 +98,7 @@ defmodule Derivate do
   end
 
   def test3() do
-    e={
-        {:ln, {:var, :x}}}
+    e={{:ln, {:var, :x}}}
     d=deriv(e, :x)
     c=calc(d, :x, 4)
     IO.write("Expression: #{pprint(e)}\n")
@@ -126,6 +125,49 @@ defmodule Derivate do
     IO.write("expression: #{pprint(e)}\n")
     IO.write("derivative: #{pprint(d)}\n")
     IO.write("simplified: #{pprint(simplify(d))}\n")
+    :ok
+  end
+
+  #test x^n
+  def test6() do
+    e={:exp, {:var,:x}, {:var,:p}}
+    d=deriv(e, :x)
+    c=calc(d, :n, 2)
+    IO.write("Expression: #{pprint(e)}\n")
+    IO.write("Derivative: #{pprint(d)}\n")
+    :ok
+  end
+
+  #test ln(x)
+  def test7() do
+    e={:ln, {:var, :x}}
+    d=deriv(e, :x)
+    c=calc(d, :x, 2)
+    IO.write("Expression: #{pprint(e)}\n")
+    IO.write("Derivative: #{pprint(d)}\n")
+    IO.write("Calculated: #{pprint(simplify(c))}\n")
+    :ok
+  end
+
+  #test Sqrt(x)
+  def test8() do
+    e={:exp, {:var,:x}, {:num, 0.5}}
+    d=deriv(e, :x)
+    c=calc(d, :n, 2)
+    IO.write("Expression: #{pprint(e)}\n")
+    IO.write("Derivative: #{pprint(d)}\n")
+    IO.write("Simplified: #{pprint(simplify(d))}\n")
+    :ok
+  end
+
+  #test 1/x
+  def test9() do
+    e={:exp, {:var,:x}, {:num,-1}}
+    d=deriv(e, :x)
+    c=calc(d, :n, 2)
+    IO.write("Expression: #{pprint(e)}\n")
+    IO.write("Derivative: #{pprint(d)}\n")
+    IO.write("Simplified: #{pprint(simplify(d))}\n")
     :ok
   end
 
