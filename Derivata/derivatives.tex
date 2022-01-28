@@ -1,0 +1,121 @@
+documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Derivative}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+
+For this assignment we were supposed to create function that can via help of pattern matching take the derivative of mathematical function and display it for the user in various ways.
+
+\section{Representing functions}
+
+In Elixir it is possible to represent a function as  $f = fn(x) -> x * 2 $ by picking apart the function and representing it as a multiplication between the variable(argument) and a constant(2).
+
+\section{Math expressions}
+
+To make it easier and "cleaner" to write the code the first step was to create "type variables" that we could reuse. In other words, we create tuples for all expressions/variables.
+
+\begin{minted}{elixir}
+  @type literal() :: {:num, number()} | {:var, atom()}
+  @type expr() :: literal()
+  | {:add, expr(), expr()}
+  | {:mul, expr(), expr()}
+  | {:expr, expr(), literal()}
+  | {:expr, expr(), expr()}
+  | {:ln, expr()}
+  | {:sub, expr(), expr()}
+  | {:sqrt, expr()}
+  | {:sin, expr()}
+  | {:cos, expr() }
+\end{minted}
+
+\section{Derivatives}
+Then we could implement the rules that we will use to calculate the derivatives. The implementation is pretty basic as long as you understand thoroughly how the derivation rules work.
+
+Rules were implemented for addition, multiplication, exponents, sine, cosine, natural logarithms and square root.
+
+\begin{minted}{elixir}
+def deriv({:num, _}, _) do {:num, 0} end
+def deriv({:var, v}, v) do {:num, 1} end
+def deriv({:var, _}, _) do {:num, 0} end
+
+def deriv({:add, e1, e2}, v) do 
+    {:add, deriv(e1,v), deriv(e2,v)} end #add
+
+def deriv({:mul, e1, e2}, v) do 
+    {:add, {:mul, deriv(e1, v), e2}, {:mul, e1, deriv(e2, v)}} end #mul
+
+def deriv({:exp, e, {:num, n}}, v) do 
+    {:mul, {:mul, {:num, n}, {:exp, e, {:num, n-1}}}, deriv(e, v)} end #x^a
+    
+def deriv({:exp, {:var, x}, {:var, n}}, v) do
+    {:mul, {:var, n}, {:exp, {:var, x}, {:add, {:var, n}, {:num, -1}}}} end #x^n
+
+def deriv({:sin, e}, v) do 
+    {:mul, deriv(e, v), {:cos, e}} end #sin(x)
+
+def deriv({:cos, e}, v) do
+    {:mul, {:num, -1}, {:mul, deriv(e, v), {:sin, e}}} end #cos(x)
+
+def deriv({:ln, x}, x) do
+    {:frac, 1, x} end #ln(x)
+def deriv({:ln, e1}, v) do
+    { :div, deriv(e1, v), e1 } end
+
+def deriv({:sqrt, e1}, x) do
+    {:frac, deriv(e1,x), {:mul, {:const, 2}, {:sqrt, e1}}} end #sqr(x)
+\end{minted}
+
+\section{Printing the results}
+Another problem is for the user to be able to easily read the output to the console. Some additional functions were created for this exact purpose.
+
+\begin{minted}{elixir}
+def pprint({:num, n}) do "#{n}" end
+def pprint({:var, v}) do "#{v}" end
+def pprint({:add, e1, e2}) do "(#{pprint(e1)} + #{pprint(e2)})" end
+def pprint({:mul, e1, e2}) do "#{pprint(e1)} * #{pprint(e2)}" end
+def pprint({:exp, e1, e2}) do "(#{pprint(e1)})^(#{pprint(e2)})" end
+def pprint({:ln, e1}) do "ln(#{pprint(e1)})" end
+def pprint({:sin, e1}) do "sin(#{pprint(e1)})" end
+def pprint({:cos, e1}) do "cos(#{pprint(e1)})" end
+\end{minted}
+
+\section{Simplify the functions}
+A lot of unnecessary literals were printed to the console for instance $x$ could be displayed as $x * 1 $, to avoid this some functions were created to simplify the output, so it looks more like if the math were calculated by hand.
+
+\begin{minted}{elixir}
+def simplify({:add, e1, e2}) do simplify_add(simplify(e1), simplify(e2)) end
+def simplify({:mul, e1, e2}) do simplify_mul(simplify(e1), simplify(e2)) end
+def simplify({:exp, e1, e2}) do simplify_exp(simplify(e1), simplify(e2)) end
+def simplify(e) do e end
+
+def simplify_add(e1, {:num, 0}) do e1 end
+def simplify_add({:num, 0}, e2) do e2 end
+def simplify_add({:num, n1}, {:num, n2}) do {:num, n1+n2} end
+def simplify_add(e1, e2) do {:add, e1, e2} end
+
+def simplify_mul({:num, 0}, _) do {:num, 0} end
+def simplify_mul(_, {:num, 0}) do {:num, 0} end
+def simplify_mul(e1, {:num, 1}) do e1 end
+def simplify_mul({:num, 1}, e2) do e2 end
+def simplify_mul({:num, n1}, {:num, n2}) do {:num, n1*n2} end
+def simplify_mul(e1, e2) do {:mul, e1, e2} end
+
+def simplify_exp(_, {:num, 0}) do {:num, 1} end
+def simplify_exp(e1, {:num, 1}) do e1 end
+def simplify_exp({:num, n1}, {:num, n2}) do {:num, :math.pow(n1,n2)} end
+def simplify_exp(e1, e2) do {:exp, e1 ,e2} end
+\end{minted}
+
+\end{document}
