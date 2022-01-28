@@ -7,26 +7,30 @@ defmodule Derivate do
   | {:expr, expr(), literal()}
   | {:expr, expr(), expr()}
   | {:ln, expr()}
-  | {:frac, literal(), literal()}
   | {:sub, expr(), expr()}
   | {:sqrt, expr()}
   | {:sin, expr()}
   | {:cos, expr() }
-  | {:div, literal(), literal()}
+  | {:frac, literal(), expr()}
 
   def deriv({:num, _}, _) do {:num, 0} end
   def deriv({:var, v}, v) do {:num, 1} end
   def deriv({:var, _}, _) do {:num, 0} end
+
   def deriv({:add, e1, e2}, v) do {:add, deriv(e1,v), deriv(e2,v)} end
+
   def deriv({:mul, e1, e2}, v) do {:add, {:mul, deriv(e1, v), e2}, {:mul, e1, deriv(e2, v)}} end
+
   def deriv({:exp, e, {:num, n}}, v) do {:mul, {:mul, {:num, n}, {:exp, e, {:num, n-1}}}, deriv(e, v)} end
   def deriv({:exp, {:var, x}, {:var, n}}, v) do {:mul, {:var, n}, {:exp, {:var, x}, {:add, {:var, n}, {:num, -1}}}} end #x^n
+
   def deriv({:sin, e}, v) do {:mul, deriv(e, v), {:cos, e}} end #sin(x)
+
   def deriv({:cos, e}, v) do {:mul, {:num, -1}, {:mul, deriv(e, v), {:sin, e}}} end #cos(x)
 
-  def deriv({:ln, x}, x) do {:frac, 1, x} end #ln(x)
-  def deriv({:ln, e1}, v) do { :div, deriv(e1, v), e1 } end
-  def deriv({:frac, e1, e2}, x) do {:frac, {:sub, {:mul, deriv(e1,x), e2}, {:mul, deriv(e2, x), e1}}, {:pwr, e2, 2}} end #1/x
+  def deriv({:ln, x}, x) do {:mul} end #ln(x)
+  def deriv({:ln, x}, x) do {{{:var, x}, {:exp, e, {:num, -1}}}, deriv(e, v)} end
+
   def deriv({:sqrt, e1}, x) do {:frac, deriv(e1,x), {:mul, {:const, 2}, {:sqrt, e1}}} end #sqr(x)
 
   def calc({:num, n}, _, _) do {:num, n} end
