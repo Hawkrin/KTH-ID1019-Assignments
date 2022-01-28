@@ -1,4 +1,4 @@
-documentclass[a4paper,11pt]{article}
+d\documentclass[a4paper,11pt]{article}
 
 \usepackage[utf8]{inputenc}
 
@@ -32,10 +32,7 @@ To make it easier and "cleaner" to write the code the first step was to create "
   | {:add, expr(), expr()}
   | {:mul, expr(), expr()}
   | {:expr, expr(), literal()}
-  | {:expr, expr(), expr()}
   | {:ln, expr()}
-  | {:sub, expr(), expr()}
-  | {:sqrt, expr()}
   | {:sin, expr()}
   | {:cos, expr() }
 \end{minted}
@@ -43,7 +40,9 @@ To make it easier and "cleaner" to write the code the first step was to create "
 \section{Derivatives}
 Then we could implement the rules that we will use to calculate the derivatives. The implementation is pretty basic as long as you understand thoroughly how the derivation rules work.
 
-Rules were implemented for addition, multiplication, exponents, sine, cosine, natural logarithms and square root.
+Rules were implemented for addition, multiplication, exponents, sine, cosine, natural logarithms and square root. 
+
+A more ideal solution to this would be to implement some fraction pattern, but instead to make my life easier I wrote the fractions as exponents instead. For instance $1/x$ is written as $x^-1$
 
 \begin{minted}{elixir}
 def deriv({:num, _}, _) do {:num, 0} end
@@ -51,34 +50,29 @@ def deriv({:var, v}, v) do {:num, 1} end
 def deriv({:var, _}, _) do {:num, 0} end
 
 def deriv({:add, e1, e2}, v) do 
-    {:add, deriv(e1,v), deriv(e2,v)} end #add
+    {:add, deriv(e1,v), deriv(e2,v)} end
 
 def deriv({:mul, e1, e2}, v) do 
-    {:add, {:mul, deriv(e1, v), e2}, {:mul, e1, deriv(e2, v)}} end #mul
+    {:add, {:mul, deriv(e1, v), e2}, {:mul, e1, deriv(e2, v)}} end
 
 def deriv({:exp, e, {:num, n}}, v) do 
-    {:mul, {:mul, {:num, n}, {:exp, e, {:num, n-1}}}, deriv(e, v)} end #x^a
-    
-def deriv({:exp, {:var, x}, {:var, n}}, v) do
+    {:mul, {:mul, {:num, n}, {:exp, e, {:num, n-1}}}, deriv(e, v)} end
+
+def deriv({:exp, {:var, x}, {:var, n}}, v) do 
     {:mul, {:var, n}, {:exp, {:var, x}, {:add, {:var, n}, {:num, -1}}}} end #x^n
 
 def deriv({:sin, e}, v) do 
     {:mul, deriv(e, v), {:cos, e}} end #sin(x)
 
-def deriv({:cos, e}, v) do
+def deriv({:cos, e}, v) do 
     {:mul, {:num, -1}, {:mul, deriv(e, v), {:sin, e}}} end #cos(x)
 
-def deriv({:ln, x}, x) do
-    {:frac, 1, x} end #ln(x)
-def deriv({:ln, e1}, v) do
-    { :div, deriv(e1, v), e1 } end
-
-def deriv({:sqrt, e1}, x) do
-    {:frac, deriv(e1,x), {:mul, {:const, 2}, {:sqrt, e1}}} end #sqr(x)
+def deriv({:ln,{:var, x}}, _v) do 
+    {:exp, {:var,x}, {:num, -1}} end #ln(x)
 \end{minted}
 
 \section{Printing the results}
-Another problem is for the user to be able to easily read the output to the console. Some additional functions were created for this exact purpose.
+Another problem is for the user to be able to easily read the output to the console. Some additional functions were created for this exact purpose. A lot of the later added derivative rules could use the earlier created pprint functions. So not a lot of new coded was needed when the foundation had been made.
 
 \begin{minted}{elixir}
 def pprint({:num, n}) do "#{n}" end
@@ -117,5 +111,8 @@ def simplify_exp(e1, {:num, 1}) do e1 end
 def simplify_exp({:num, n1}, {:num, n2}) do {:num, :math.pow(n1,n2)} end
 def simplify_exp(e1, e2) do {:exp, e1 ,e2} end
 \end{minted}
+
+\section{Conclusion}
+Overall this was an interesting assignment which show that when you use recursion and pattern matching you save a lot of code space. You can do a lot with just a few lines code, and the program can easily be built upon if other features and functions are to be implemented.
 
 \end{document}

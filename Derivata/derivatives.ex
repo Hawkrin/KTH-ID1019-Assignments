@@ -5,13 +5,10 @@ defmodule Derivate do
   | {:add, expr(), expr()}
   | {:mul, expr(), expr()}
   | {:expr, expr(), literal()}
-  | {:expr, expr(), expr()}
   | {:ln, expr()}
-  | {:sub, expr(), expr()}
-  | {:sqrt, expr()}
   | {:sin, expr()}
   | {:cos, expr() }
-  | {:frac, literal(), expr()}
+
 
   def deriv({:num, _}, _) do {:num, 0} end
   def deriv({:var, v}, v) do {:num, 1} end
@@ -31,7 +28,6 @@ defmodule Derivate do
 
   def deriv({:ln,{:var, x}}, _v) do {:exp, {:var,x}, {:num, -1}} end #ln(x)
 
-  def deriv({:sqrt, e1}, x) do {:frac, deriv(e1,x), {:mul, {:const, 2}, {:sqrt, e1}}} end #sqr(x)
 
   def calc({:num, n}, _, _) do {:num, n} end
   def calc({:var, v}, v, n) do {:num, n} end
