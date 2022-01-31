@@ -6,14 +6,4 @@ defmodule Lst do
     {:cons, head, append(tail, y)}
   end
 
-  #add element to queue
-  def add(queue, elem) do
-
-  end
-
-  #remove element from queue
-  def remov(queue) do
-
-  end
-
 end
