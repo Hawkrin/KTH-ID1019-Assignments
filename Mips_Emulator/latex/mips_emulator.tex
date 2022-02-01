@@ -1,0 +1,85 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Mips Emulator}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+
+For this assignment we were supposed to combine our knowledge of MIPS assembly with functional programming in the form of elixir. The main idea is to implement an emulator in elixir.
+
+\section{What to implement}
+
+The goal is to implement and run the following "assembly code":
+
+\begin{minted}{c}
+- add $d $s $t : add the values of register $s and $t and place result
+in $d.
+
+- sub $d $s $t : subtract the values of register $s and $t and place
+result in $d.
+
+- addi $d $t imm : add the values of register $t and the immediate
+value imm and place result in $d.
+
+- lw $d offset($t) :load the value found at address offset + $t
+and place it in $d.
+
+- sw $s offset($t) : store the value in register $s at address offset
++ $t.
+
+- beq $s $t offset : branch to pc + offset if values at $s and $t
+are equal
+\end{minted}
+
+
+\section{Application build}
+
+The application will consists of a couple of modules:
+
+\begin{itemize}
+\item Program: The module should be able to create a code segment and a
+		data segment given a program description. It should provide functions
+		to read from the code segment and both read and write to a data
+		segment.
+\end{itemize}
+
+\begin{itemize}
+\item Register: The register module should handle all operations for the
+		registers: create a new register structure and, read and write to individual registers.
+\end{itemize}
+
+
+\begin{itemize}
+\item Out: The module should collect the output from the execution and
+		be able to return it as a list of integers.
+\end{itemize}
+
+
+\begin{itemize}
+\item Emulator: This module is the heart of the system. It should be able
+        to take a program, transform it to a code and data segment and then
+        execute the program and return the output.
+\end{itemize}
+
+
+\begin{itemize}
+\item Memory: Handles the applications memory.
+\end{itemize}
+
+\section{Current State of Program}
+
+Unfortunately I haven't been able to solve this task. I've made an mix application with the files from the id1019 github and the test code works. But I haven't managed to understand how I should implement the required parts for this program. Even though it "clearly" states what the program misses for it to work properly, my short period of programming can't manage to find HOW and really what to implement. But I will not give up.
+
+
+\end{document}
