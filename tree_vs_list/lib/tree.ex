@@ -1,4 +1,4 @@
-defmodule Tree do 
+defmodule Tree do
 
   def tree_new() do ... end
 

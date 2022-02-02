@@ -1,4 +1,4 @@
-defmodule Tree do
+defmodule BSTree do
 
   #node representaion -> {:node, element, rightleaf, leftleaf}
 
