@@ -34,7 +34,7 @@ So for the list implementation, 2 functions were used. The first one called $lis
 \section{Tree}
 
 For the tree implementation also 2 functions were used. The first one works similarly to the list one and is called $tree\_new$. The second function is split into multiple parts. The first three parts can be seen as base cases. Which are called upon if the tree is empty, or if there's only one current node(head) in the tree, then we will insert the new node(e) into the tree and make the current node(head) in the tree a "leaf" to the new node(e) or IF the new node(e) is smaller then the current node(head)
-If the tree is of a bigger scale than 0 or 1 nodes, then the two later parts will be executed, here we recursively move through the tree and compare our new node(e) with the rest of the nodes in the tree. 
+If the tree is of a bigger scale than 0 or 1 nodes, then the two later parts will be executed, here we recursively move through the tree and compare our new node(e) with the rest of the nodes in the tree. Starting with the root, until the right place for the new node(e) is found.
 
 \begin{minted}{elixir}
 def tree_new() do :nil end
@@ -56,7 +56,7 @@ def tree_insert(e, {:node, head, left, right}) do
 
 \section{Bench}
 
-The following functions were used for testing the insertion time of the data structures. The same list of elements were used for both data structures.
+Bench is a function that was used for the test it calls itself 100 times via a loop. The list ls determines the length of the list/tree that are run. All elements in ls are thrown into the bench function together with four other functions. Two that creates a tree and a list and two that inserts the elements into these data structures. And then together with a function called time the list of various size with random elements are inserted in the created list and tree. Timer calculates how long it takes to create the list/tree.
 
 \begin{minted}{elixir}
 def bench() do bench(100) end
@@ -101,7 +101,11 @@ end
 
 \section{Result}
 
-\begin{table}[h]
+The elements used for the tests are randomized, so there's a new result every time the program is run. Though the result are pretty similar, I chose the display one of the more arbitrary tests.
+
+Here are the following results:
+
+\begin{table}
 \begin{center}
 \begin{tabular}{|c|c|}
 \textbf{list} & \textbf{tree}\\
@@ -117,10 +121,14 @@ end
       4457369 &     121753\\
         21034700 &     354201\\
 \end{tabular}
-\caption{Insertion time of elements in a list and a tree, runtime in microseconds}
+\caption{Insertion time of elements in a list and a tree, run time in microseconds}
 \label{tab:table1}
 \end{center}
 \end{table}
+
+From this table we can see that the tree data structure used is at first twice as fast as the lists and then the lists time increases exponentially. So overall the tree data structure is the right choice if run time is the main focus.
+
+
 
 
 \end{document}
