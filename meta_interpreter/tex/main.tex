@@ -1,0 +1,95 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Meta Interpreter}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+
+This time the task was to implement a small and "simple" interpreter for a language that might be seen as a functional subset of Elixir. So in other words we should be able to run some elixir code without actually using a compiler.
+
+
+\section{Background}
+To be able to do this lab, some research had to be done. Both on what an interpreter do and how it works, but also how a programming language like elixir is built. All the way down to the math level. First we start out with an expression and then we use the knowledge we claimed and develop the program even more in the form of pattern matching and then even functions.
+
+\section{Environment}
+The first step was to implement an environment, which will work as a mapping from variables to data structures. The environment is represented as a list of tuples, which contains atoms. The following functions were created in a module called env(short for environment):
+
+\begin{minted}{elixir}
+ # return an empty environment
+  def new() do [] end
+
+  # return an environment where the binding of the variable id to the structure str has been added to the environment env
+  def add(id, str, []) do [{id, str}] end
+  def add(id, str, [{id, _} | tail]) do [{id, str} | tail] end
+  def add(id, str, [head | tail]) do [head | add(id, str, tail)] end
+
+  # return either {id, str}, if the variable id was bound, or nil
+  def lookup(_, []) do nil end
+  def lookup(id, [{id, str} | _]) do {id, str} end
+  def lookup(id, [_ | tail]) do lookup(id, tail) end
+
+  #returns an environment where all bindings for variables in the list ids have been removed
+  def remove([], env) do env end
+  def remove([id | ids], env) do remove(ids, remove_help(id, env)) end
+
+  def remove_help(_, []) do [] end
+  def remove_help(id, [{id, _} | tail]) do tail end
+  def remove_help(id, [head | tail]) do [head | remove_help(id, tail)] end
+  
+\end{minted}
+
+\section{Expressions}
+First a simple expression were made for a single atom. Here we only really return the atom if the expression in an atom:
+
+\begin{minted}{elixir}
+def eval_expr({:atm, id}, _, _) do {:ok, id} end
+\end{minted}
+
+Then it's possible to do some expressions that's a bit more complicated, but not to hard:
+\begin{minted}{elixir}
+ # if expression is a variable, look up and return the variable, else return error
+  def eval_expr({:var, id}, env) do
+    case Env.lookup(id, env) do
+      nil ->
+        :error
+      {_, str} ->
+        {:ok, str}
+    end
+  end
+ \end{minted}
+
+
+\section{Pattern matching}
+"A pattern matching will take a pattern, a data structure and an environment and return either {:ok, env}, where env is an extended environment, or the atom :fail." Our language also needs to have support for pattern matcing which wasn't that much harder than expressions. An example of a pattern matching function:
+
+\begin{minted}{elixir}
+ # If the left side is a vaitable we will evaluate it
+  def eval_match({:var, id}, str, env) do
+    case Env.lookup(id, env) do
+      nil ->
+        {:ok, Env.add(id, str, env)} #if the variable doesn't exist we add it
+    {_, ^str} ->
+        {:ok, env} #we return the environment if its the same structure as the right?
+    {_, _} ->
+      :fail # fail
+    end
+  end
+\end{minted}
+
+
+\section{Conclusion}
+After the foundation above was made then we could develop the "language" even further by creating sequences which are represented as a list, which consists of both pattern matching and regular expressions. After this step when the interpreter could handle a sequence of expressions as well, it was time to complicate it a bit and make so it could also handle case expressions which are described as "A case expression consists of an expression and a list of clauses where each clause is a pattern and a sequence." To be able to tell a part the case expressions with the ordinary expressions a tuple called :clause were used. The last step was to be able to handle named functions. So we were given a program module which we can make a function call to after adding a new term {:fun, id} to our language. This assignment were quite large and a bit tedious/time consuming, but it gave an interesting insight of how a language(more basic) like elixir us built, and how it might work under the hood. I liked that we were given examples to try after each step, so you are able to see that you have done everything right before you continue building the language.
+
+
+\end{document}

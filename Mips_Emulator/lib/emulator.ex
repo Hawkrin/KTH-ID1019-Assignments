@@ -5,7 +5,6 @@ defmodule Emulator do
     run(0, code, mem, reg, out)
   end
 
-
   def run(pc, code, mem, reg, out) do
 
     next = Program.read(code, pc)

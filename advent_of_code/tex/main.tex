@@ -1,0 +1,72 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Advent of Code}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+For this assignment we were supposed to do the day one task from the advent of code website. The task was split into two different parts, both having to do with data manipulation of a list. Both task implementations were first tested with a smaller list just to see if the implementation works and then they were applied on the larger list when I knew that the program does what it's supposed to do.
+
+\section{Task 1}
+The first task was to iterate through a list and counter every iterating step where the new element is larger than the previous one. This task would be very simple to do in a iterative language but in a functional language a bit more thought process was required. Two functions are being used, the main function recursively iterates through the list and calls on the second function that handles the comparing of the elements. And a counter variable is used to count every time a new element is larger than the previous one.
+
+\begin{minted}{elixir}
+
+def iterator([], counter) do counter end
+def iterator([_h|[]], counter) do counter end
+def iterator([h|t], counter) do
+  counter = counter + compare(h, hd(t))
+  iterator(t, counter)
+end
+
+def compare(e, e1) do
+  if(e < e1) do
+      1
+  else
+      0
+  end
+end
+
+\end{minted}
+
+The solution for this task is that 1564 measurements are larger than the previous ones.
+
+
+\section{Task 2}
+For the second task, we were supposed to sum the elements in blocks of three and then to the same as in the first task. The code for this task is very similar to the one used in the first task, the only main difference are the utilization of the chunk method from the elixir library. Which were used to create "sub-chunks" of our list, into smaller lists which contains three elements. So in this case a new chunk/small list is created containing three elements and then we move one step and do the same again until we have traversed through the list.
+
+So as mentioned the code is pretty similar to task one, because the same iteration is required in this task. A difference is that first the list is split up into chunks of three which then are summarized and compared via the compare method.
+\begin{minted}{elixir}
+def iterator([h|t]) do iterator(Enum.chunk([h|t], 3, 1), _counter=0) end
+def iterator([], counter) do counter end
+def iterator([_h|[]], counter) do counter end
+def iterator([h|t], counter) do
+  counter = counter + compare(h, hd(t))
+  iterator(t, counter)
+end
+
+def compare(a=[_,_,_], b=[_,_,_]) do
+  if(Enum.sum(a) < Enum.sum(b)) do
+      1
+  else
+      0
+  end
+end
+\end{minted}
+
+If the code works and I think it does, then the solution for task 2 would be that 1611 sums are larger than the previous ones.
+
+\section{Conclusion}
+This was a interesting task, with clear directives which were appreciated. I especially liked that task 2 could be solved by changing and doing some more implementations on the first task.
+
+\end{document}
