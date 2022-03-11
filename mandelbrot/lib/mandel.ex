@@ -2,10 +2,10 @@ defmodule Mandel do
 
   def mandelbrot(width, height, x, y, k, depth) do
     trans = fn(w, h) ->
-    Cmplx.new(x + k * (w - 1), y - k * (h - 1))
+      Cmplx.new(x + k * (w - 1), y - k * (h - 1))
     end
     rows(width, height, trans, depth, [])
-    end
+  end
 
   def rows(_ , 0, _ , _, rows) do rows end
   def rows(w, h, tr, depth, rows) do
@@ -17,7 +17,7 @@ defmodule Mandel do
   def row(w, h, tr, depth, rows) do
     c = tr.(w, h)
     res = Mandelbrot.mandelbrot(c, depth)
-    color = Color.convert(res, depth)
+    color = Color.convert2(res, depth)
     row(w-1,h, tr, depth, [color | rows])
   end
 

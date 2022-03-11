@@ -12,8 +12,8 @@ defmodule Mandelbrot do
   def test(i, z, c, m) do
     var = Cmplx.abs(z)
     if var <= 2.0 do
-      z1 = Cmplx.add(Cmplx.sqr(z), c)
-      test(i+1, z1, c, m)
+      var2 = Cmplx.add(Cmplx.sqr(z), c)
+      test(i+1, var2, c, m)
     else i
     end
   end
