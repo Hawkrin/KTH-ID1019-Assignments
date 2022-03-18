@@ -5,21 +5,21 @@ defmodule Morse do
       encode_table = encode_table(tree)
       my_name_encoded = encode(my_name(), encode_table)
       IO.puts(my_name_encoded)
-      sign1_decoded = decode(signal1(), tree)
-      IO.puts(sign1_decoded)
-      sign2_decoded = decode(signal2(), tree)
-      IO.puts(sign2_decoded)
+      message1_decoded = decode(message1(), tree)
+      IO.puts(message1_decoded)
+      message2_decoded = decode(message2(), tree)
+      IO.puts(message2_decoded)
   end
 
   def my_name() do
     'malcolm liljedahl'
   end
 
-  def signal1 do
+  def message1 do
       '.- .-.. .-.. ..-- -.-- --- ..- .-. ..-- -... .- ... . ..-- .- .-. . ..-- -... . .-.. --- -. --. ..-- - --- ..-- ..- ... '
   end
 
-  def signal2 do
+  def message2 do
       '.... - - .--. ... ---... .----- .----- .-- .-- .-- .-.-.- -.-- --- ..- - ..- -... . .-.-.- -.-. --- -- .-----
       .-- .- - -.-. .... ..--.. ...- .----. -.. .--.-- ..... .---- .-- ....- .-- ----. .--.-- ..... --... --. .--.-- .....
       ---.. -.-. .--.-- ..... .---- '
