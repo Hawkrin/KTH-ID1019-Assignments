@@ -1,0 +1,138 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Prime Numbers}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+For this assignment we were supposed to create three different implementation of "prime number finder" that utilizes Sieve of Eratosthenes on a list of numbers, starting with number two. And when all these different implementations are done, a bench test should be run which will compare the run time of the implementations. 
+
+\section{The first implementation}
+In the first implementation the task was to remove all numbers that aren't prime numbers by utilizing the rem function. The function starts by setting the 2 which is our first number in the list as head. And then check if the the rest of the list(3->n) can be divided by the head. Then we take out the current head(2) and we do a new recursion call where the next number(3) is the new head, and then we will continue doing this.
+
+\begin{minted}{elixir}
+
+def primeFinder([]) do [] end
+    
+def primeFinder([h|t]) do
+    seq = [h|Enum.filter([h|t], fn e -> rem(e, h) != 0 end)]
+    [hd(seq)|primeFinder(tl(seq))]
+end
+
+\end{minted}
+
+
+\section{The second implementation}
+In the second implementation, the task was to create an additional list where all the prime numbers we find should be stored. The implementation goes through the list each number after the other and checks if it's divide able with any of the prime numbers that we have found and put in our new list. If it's divide able with any of the prime numbers we "throw" it away but if it's not divide able then we have found a new prime number and it will then be added to the list.
+
+\begin{minted}{elixir}
+def primtFinder2([h1 | t1], []) do
+  primtFinder2([h1 | t1], [h1]) # adds two to the list
+end
+
+def primtFinder2([], listOfPrimes) do listOfPrimes end
+
+def primtFinder2(full_list = [h1 | t1], listOfPrimes = [h2 | t2]) do
+    primeFound = checkIfPrime(full_list, listOfPrimes)
+    listOfPrimes = insertPrime(primeFound, h1, listOfPrimes)
+    primtFinder2(t1, listOfPrimes)
+end
+
+def checkIfPrime(_, []) do true end
+
+def checkIfPrime(full_list = [h1 | t1], listOfPrimes = [h2 | t2]) do #check if prime number or not
+  if rem(h1, h2) == 0 do
+      false
+  else
+      checkIfPrime(full_list, t2)
+  end
+end
+
+def insertPrime(primeFound, prime, listOfPrimes) do
+  if primeFound do
+    listOfPrimes ++ [prime]
+  else
+      listOfPrimes
+  end
+end
+\end{minted}
+
+\section{The third implementation}
+The third implementation is pretty much identical to the second implementation. The main difference is that the instead of inserting the new prime numbers we find in the end of the "prime number list", we should insert them in the start of the list and when the algorithm is done the list should be reversed.
+
+\begin{minted}{elixir}
+def primeFinder3([h1 | t1], []) do
+      primeFinder3([h1 | t1], [h1]) #2
+end
+
+def primeFinder3([], listOfPrimes) do
+  listOfPrimes = Enum.reverse(listOfPrimes)
+end
+
+def primeFinder3(full_list = [h1 | t1], listOfPrimes = [h2 | t2]) do
+  primeFound = checkIfPrime2(full_list, listOfPrimes)
+  listOfPrimes = insertPrime2(primeFound, h1, listOfPrimes)
+  primeFinder3(t1, listOfPrimes)
+end
+
+def checkIfPrime2(_, []) do true end
+
+def checkIfPrime2(full_list = [h1 | t1], listOfPrimes = [h2 | t2]) do
+  if rem(h1, h2) == 0 do
+      false
+  else
+      checkIfPrime2(full_list, t2)
+  end
+end
+
+def insertPrime2(primeFound, prime, listOfPrimes) do
+  if primeFound do
+      [prime | listOfPrimes ]
+  else
+      listOfPrimes
+  end
+end
+\end{minted}
+
+
+\section{Testing and comparison}
+For testing the algorithms the same bench method that was used for the tree vs list assignment were used, and modify to work with this assignment. After a quick glance we can see that the second implementation is by far the quickest one. I would guess that's it's quicker than the first one because we don't have to do as many comparisons. It's a bit unclear why the third implementation is so much slower when we get to longer lists, because we also need to do the reversing which could take some time.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\textbf{1st impl} & \textbf{2nd impl} & \textbf{3nd impl}\\
+\hline
+       204 & 0&    102\\
+      409 &   102&  204\\
+        1530 & 409 &   512\\
+       1740 &  819 &  1840\\
+      4810 &    2350& 6240\\
+        14000 &  8800 &  21200\\
+      51200 &  20100  & 74900\\
+      128000 &  63000 &  273000\\
+      518000 &  213000  & 1000000\\
+        1750000 & 668000 &   3720000\\
+\end{tabular}
+\caption{Execution time of the different prime number finding algorithms, run time in microseconds}
+\label{tab:table1}
+\end{center}
+\end{table}
+
+
+
+
+\section{Conclusion}
+This was an interesting assignment, both having to do some research and realizing how brilliant the Sieve of Eratosthenes algorithm is. But also trying to implement this in a recursive fashion in elixir. It took some time but with the help of some fellow students and some TAs this task could be completed.
+
+\end{document}

@@ -1,0 +1,109 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Huffman}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+For this assignment the goal was to create and work with Huffmans decoding/encoding algorithm. We will look on different ways of representing data in the form of lists, trees and tuples.
+
+\section{Implementation}
+The implementation of this algorithm is divided into different steps, in the form of creating a tree, some encoding and decoding functions,
+
+\section{Step 1 - Tree}
+The first step for this task was to find out the frequency of the characters in the given text. A function called freq was created for this purpose. The function returns a list of tuples which contain each character and it's frequency throughout the text. We will use this outcome to construct our tree data structure.
+
+\begin{minted}{elixir}
+ def huffman(freq) do
+    sorted_freq = Enum.sort(freq, fn({_, x}, {_, y}) -> x < y end)
+    huffman_tree(sorted_freq)
+end
+
+def huffman_tree([{char, _}]) do char end #last iteration
+def huffman_tree(_=[{char1, freq1}, {char2, freq2} | t]) do
+    huffman_coding = huffman_coding({{char1, char2}, freq1 + freq2}, t)
+    huffman_tree(huffman_Coding)
+end
+\end{minted}
+
+We will run through the list(sample in this case) and store the chars and their frequencies.
+
+\begin{minted}{elixir}
+# Checks the frequency of characters
+def freq(sample) do freq(sample, []) end
+def freq([], freq) do freq end
+def freq([char | rest], freq) do
+    new_freq = List.flatten(evaluate(char, freq))
+    freq(rest, new_freq)
+end
+\end{minted}
+
+When we got the frequencies of the character calculated then a smart next step would be to sort the characters depending on their frequencies. A list is being created and in this list the characters are being placed in order, if a character already exists in the list then the update function is being called, and that character is updated by adding 1.
+
+The next step was to create the tree and sort the lists of tuples. The characters with lower frequencies will be located at the bottom of the tree because of their longer branches and the characters with higher frequencies will have shorter branches and therefor will be located at the top of the tree.
+
+\section{Step 2 - Huffman Encoding}
+In the next step the task was to construct an encoding table and then traverse through the tree that was constructed before and build a binary encoding for each character.
+
+\begin{minted}{elixir}
+# Construct encoding table
+def encode_table(tree) do
+    tree = binary(tree)
+    tree = Enum.sort(tree, fn({_,x},{_,y}) -> length(x) < length(y) end) 
+    Enum.sort(tree, fn({_,x},{_,y}) -> length(x) < length(y) end)  
+end
+
+#Encode text
+def encode_characters([], _) do [] end
+def encode_characters([char | tail], huffman_tree) do
+    {_, bits} = List.keyfind(huffman_tree, char, 0)
+    bits ++ encode_characters(tail, huffman_tree)
+end
+\end{minted}
+
+The sequences are presented as lists of binaries(1s and 0s). We have a text here that we represent as a list of characters, and each character have a sequence of bits(1s and 0s) that we can find in our table. This table can be used for encoding and decoding.
+
+\section{Step 3 - Huffman Decoding}
+In this step the same table as in step 2 will be used. We decode by looking at the first bit sequence that is used in the coding, then we search in our table for a character which has the same bit sequence as the one we are looking for. If we can't find any, then we look for the next character by using the second bit sequence etc.
+
+\begin{minted}{elixir}  
+#Construct decoding table
+def decode_table(tree) do
+    binary(tree)
+end
+
+# Decode the sequence and return the text
+def decode_characters([], _) do [] end
+def decode_characters(seq, huffman_tree) do
+    {char, tail} = decode_chars(seq, 1, huffman_tree)
+    [char | decode_characters(tail, huffman_tree)]
+end
+
+def decode_chars(seq, n, huffman_tree) do
+    {code, tail} = Enum.split(seq, n)
+    case List.keyfind(huffman_tree, code, 1) do
+        {char, _} ->
+            {char, tail}
+        nil ->
+            decode_chars(seq, n + 1, huffman_tree)
+    end
+end
+\end{minted}
+
+\section{Step 4 - Benchmark}
+After the given bench method was reworked to work with this program the conclusion is that the tree was built relatively fast. The encoding part went a lot faster than the decoding part. It was around 30x faster to encode the table than to decode it. The reason for that is probably that for the decoding we need to continuously search for bit sequences in the table multiple times until we find it.
+
+\section{Conclusion}
+This was an interesting but time consuming task. I liked the idea behind the Huffman algorithm. We can clearly see that the decoding takes way more time than the encoding, which means that the decoding part could probably and should be more optimized for this algorithm to be really useful.
+
+\end{document}

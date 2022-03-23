@@ -1,0 +1,110 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Morse}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+In this assignment the task was to implement a program that can encode and decode Morse code. The assignment can be seen as another version of the Huffman encoding that we did before. We were given a "Morse tree" with ASCII values and our task was to be able to use this tree to encode and later decode texts. For this assignment I attended the seminar which gave a lot of information of how the program should be constructed and what was required. This will be a very brief explanation because of lack of time.
+
+\section{Tree}
+A tree was given to us and the whole assignment(both the encoding and the decoding part) was centered around this tree which consisted of nodes and the ASCII values for letters etc. Morse code consists of di's and da's. And the tree was built so our leafs gave us shorts  ’.’ and longs ’-’. Which together became Morse code which we then could decode and encode.
+
+\section{Step 1 - Morse Encoding}
+To encode ordinary text to ASCII an encode table had to be created, because utilizing the tree for this wouldn't be optimal, because of the lookup time.
+So a better idea would be to use a table for faster lookup times. The problem though is that if the table is directly presented as the tree all the letters
+will be all over the place, so when the table is created the codes needs to be sorted as well, which easily could be done with Enum.sort. A problem that occurred was that some letters gave a wrong encoding for instance "a" which is .- was printed as -. which is "n" and the same happened for other letters such as u and d. This could be solve by using the Enum.reverse library function Because they were each others opposites in Morse code.
+
+Once the encoding table was done, the text could be encoded, the task was to encode my name.
+
+\begin{minted}{elixir}
+#Create Encode table
+def encode_table(tree) do
+  table = codes(tree, [])
+  Enum.sort(table, fn({ascii1, _morse1}, {ascii2, _morse2}) -> ascii1 < ascii2 end)
+end
+def codes(:nil, _) do [] end
+def codes({:node, :na, long, short}, code) do
+  codes(long, [?-|code]) ++ codes(short, [?.|code])
+end
+def codes({:node, char, long, short}, code) do
+  [{char, Enum.reverse(code)}] ++ codes(long, [?-|code]) ++ codes(short, [?.|code])
+end
+\end{minted}
+
+\section{Step 2 - Morse Decoding}
+The second task was to implement a decoder that can take Morse code and decode it into ordinary text. Here we was restricted to decode with a time complexity of O(m). Because of this restriction a table couldn't be created as in the encode task, so the given tree were directly utilized instead.
+
+\begin{minted}{elixir}
+#Decode
+def decode([], _) do [] end
+def decode(signal, table) do
+    {char, rest} = decode_char(signal, table)
+    [char | decode(rest, table)]
+end
+
+def decode_char([], {:node, character, left, right}) do {character, []} end
+def decode_char([h|t], {:node, character, left, right}) do
+  case h do
+      ?-  -> decode_char(t, left)
+      ?.  -> decode_char(t, right)
+      ?\s  -> {character, t}
+      []  -> {character, []}
+  end
+end
+\end{minted}
+
+\section{Result}
+\subsection{Encode}
+When I encoded my name "malcolm liljedahl" it gave me:
+
+\begin{minted}{elixir}
+-- .- .-.. -.-. --- .-.. -- ..-- .-.. .. .-.. .--- . -.. .- .... .-.. 
+\end{minted}
+
+\subsection{Decode 1}
+The first message that was decoded gave me:
+\begin{minted}{elixir}
+.- .-.. .-.. ..-- -.-- --- ..- .-. ..-- 
+-... .- ... . ..-- .- .-. . ..-- -... . 
+.-.. --- -. --. ..-- - --- ..-- ..- ... 
+\end{minted}
+\begin{minted}{elixir}
+ALLŬYOURŬBASEŬAREŬBELONGŬTOŬUS
+\end{minted}
+Which I guess was supposed to be:
+\begin{minted}{elixir}
+ALL YOUR BASE ARE BELONG TO US 
+\end{minted}
+
+\subsection{Decode 2}
+The second message that was decoded gave a youtube link:
+\begin{minted}{elixir}
+.... - - .--. ... ---... .----- .----- 
+.-- .-- .-- .-.-.- -.-- --- ..- - ..- 
+-... . .-.-.- -.-. --- -- .-----
+.-- .- - -.-. .... ..--.. ...- 
+.----. -.. .--.-- ..... .---- 
+.-- ....- .-- ----. .--.-- ..... 
+--... --. .--.-- .....
+---.. -.-. .--.-- ..... .---- 
+\end{minted}
+
+
+https://www.youtube.com/watch?v=d\%51w4w9\%57g\%58c\%51 
+
+
+\section{Conclusion}
+This was an interesting task, but it was very stressful because we only had a couple of hours, compared with the other assignments where we had a whole week. It was nice to have been able to work with Huffman before though, because a lot of what I have learned for that assignment could also be utilized for this one,
+
+\end{document}

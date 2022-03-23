@@ -1,0 +1,144 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{minted}
+
+\begin{document}
+
+\title{
+    \textbf{Train Shunting}
+}
+\author{Malcolm Liljedahl}
+\date{Spring Term 2022}
+
+\maketitle
+
+\section*{Introduction}
+For this assignment we were supposed to do some train shunting between three railway track. We got one main track, as well as two others which are named "one" and "two". The task is to implement some code that can help us rearrange the order of our train carts with help of the three railway tracks. 
+
+\section{Step 1 - List processing}
+The first step was to create some functions that could help us with some list manipulations. These functions were all put in a module called list.ex.
+
+The first function is called take and returns the first n carts of the train xs.
+\begin{minted}{elixir}
+def take(xs, n) do
+        Enum.take(xs, n)
+    end
+\end{minted}
+
+The method drop returns the train xs without the first n carts.
+ \begin{minted}{elixir}  
+def drop(xs, n) do
+    xs -- Enum.take(xs, n)
+end
+\end{minted}
+
+Returns the train xs with the cart of the train ys appended.
+ \begin{minted}{elixir}  
+def append(xs, ys) do
+    xs ++ ys
+end
+\end{minted}
+
+Checks if y is a cart of the train xs
+\begin{minted}{elixir}  
+def member(xs, y) do
+    y in xs
+end
+\end{minted}
+
+Returns the first position of y in the train xs.
+\begin{minted}{elixir}  
+def position(xs, y) do position(xs, y, 1) end
+
+def position(xs, y, counter) do
+    if(hd(xs) == y) do
+        counter
+    else
+        position(tl(xs), y, (counter+1))
+    end
+end
+\end{minted}
+
+\section{Step 2 - Applying a single move}
+For the second task, we were supposed to create a function called single which takes a move and an input state and then applies the move and returns the new state.
+
+\begin{minted}{elixir}
+#Initial main
+def single({_, 0}, state) do state end
+
+#From main to either 1 or 2
+def single({_, n}, state={[],_,_}) when n>0 do 
+    state 
+end 
+
+#Remove from main and append to another list
+def single({:one, n}, state) when n>0 do
+    new = ListOperations.drop(elem(state, 0), (Enum.count(elem(state, 0))-n))
+    {elem(state, 0) -- new, new ++ elem(state, 1), elem(state, 2)}
+end
+def single({:two, n}, state) when n>0 do
+    new = ListOperations.drop(elem(state, 0), (Enum.count(elem(state, 0))-n))
+    {elem(state, 0) -- new, elem(state, 1), new ++ elem(state, 2)}
+end
+
+#From either 1 or 2 to main.
+def single({:one, n}, state={_,[],_}) when n<0 do state end
+def single({:one, n}, state) when n<0 do
+    new = ListOperations.take(elem(state, 1), -n)
+    {new ++ elem(state, 0), elem(state, 1) -- new, elem(state, 2)}
+end
+def single({:two, n}, state={_,_,[]}) when n<0 do state end
+def single({:two, n}, state) when n<0 do
+    new = ListOperations.take(elem(state, 2), -n)
+    {new ++ elem(state, 0), elem(state, 1), elem(state, 2) -- new}
+end
+\end{minted}
+
+\section{Step 3 - Applying Several Moves}
+The next step was to implement a function called move which takes an input state and a list of moves. This function utilizes the single function and does multiple function calls to it, for each move.
+
+\begin{minted}{elixir}  
+def move(moves=[_|_], state) do #takes a list of moves and calls to single
+    move(moves, state, [state])
+end
+def move([], _state, states=[_|_]) do states end
+def move(moves=[_|_], state, states=[_|_]) do
+    state = single(hd(moves), state)
+    states = states ++ [state]
+    move(tl(moves), state, states)
+end
+\end{minted}
+
+\section{Step 4 - Finding Moves}
+For this step we were supposed to create a function called find the takes in two trains xs and ys as inputs returns a list of moves, so the moves tranforms the state of xs to ys. A function split was created to split the wagons into a head and tails.
+
+\begin{minted}{elixir}  
+#xs - current train | ys - desired train.
+
+#xs -> current state , ys -> future state, [] -> list of moves
+def find(xs, ys) do find(xs, ys, []) end 
+def find(_xs, _ys=[], moves) do moves end
+def find(xs, ys, moves) do
+    split_xs = split(xs, hd(ys))
+    hs = elem(split_xs, 0)
+    ts = elem(split_xs, 1)
+    moves= moves ++ [{:one,Enum.count(ts)+1}, 
+    {:two,Enum.count(hs)}, 
+    {:one,-(Enum.count(ts)+1)}, 
+    {:two,-(Enum.count(hs))}]
+    find(tl(xs), tl(ys), moves)
+end
+def split(xs=[_|_], y) do
+    index = ListOperations.position(xs,y)
+    hs = ListOperations.take(xs, index-1)
+    ts = ListOperations.drop(xs, index)
+    {hs, ts}
+end
+\end{minted}
+
+\section{Conclusion}
+This was a interesting task, It was a interesting way of thinking of and handling different data structures, such as lists and tuples. One of the key concept in this task was to handle the states of the trains, which changed.
+
+\end{document}
